@@ -95,14 +95,14 @@ CatAtom2Osm class description:
     Class used to store a geographical coordinate (lon,lat) in text format.
 
   * TextRing.java
-    Class used to store a geographica ring (array of TextCoords) in text
+    Class used to store a geographical ring (array of TextCoords) in text
     format.
 
   * OsmFile.java
-    Class used to create (write to disk) OSM files
+    Class used to create (write to disk) OSM files.
 
   * GeoJsonFile.java
-    Class used to create (write to disk) GeoJSON files
+    Class used to create (write to disk) GeoJSON files.
 
   * OsmItem.java
     Abstract class base for all the OSM elements (nodes, ways and relations). 
@@ -114,7 +114,7 @@ CatAtom2Osm class description:
   * OsmNode.java
   * OsmWay.java
   * OsmRelation.java
-    Classes derived fro OsmItem used to store and handle information of OSM
+    Classes derived from OsmItem used to store and handle information of OSM
     elements (nodes, ways and relations).
 
 
