@@ -63,6 +63,15 @@ public class OsmFile {
 			
 			newNode.setTag("addr:housenumber", address.mDesignator);
 			
+			if (address.mStreet!=null)
+				newNode.setTag("addr:street", address.mStreet);
+			
+			if (address.mPostalCode!=null)
+				newNode.setTag("addr:postcode", address.mPostalCode);
+			
+			if (address.mAdminUnit!=null)
+				newNode.setTag("addr:city", address.mAdminUnit);
+			
 			addNode(newNode);
 		}
 	}

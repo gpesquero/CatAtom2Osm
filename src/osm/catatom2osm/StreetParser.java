@@ -66,7 +66,7 @@ public class StreetParser extends BaseGmlParser {
 		
 		if (tagName.equalsIgnoreCase("GN:text")) {
 			
-			mStreet.mName=data;
+			mStreet.mName=data.trim();
 		}
 	}
 	

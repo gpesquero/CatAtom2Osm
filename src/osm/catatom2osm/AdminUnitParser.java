@@ -66,7 +66,7 @@ public class AdminUnitParser extends BaseGmlParser {
 		
 		if (tagName.equalsIgnoreCase("GN:text")) {
 			
-			mAdminUnit.mName=data;
+			mAdminUnit.mName=data.trim();
 		}
 	}
 	

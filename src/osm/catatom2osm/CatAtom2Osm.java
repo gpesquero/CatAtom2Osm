@@ -61,8 +61,8 @@ public class CatAtom2Osm {
 		PostalCodeList postalCodeList=postalCodeParser.getPostalCodes();
 		Log.info("Number of PostalCodes: "+postalCodeList.size());
 		
-				addressGmlInputStream=adZipFile.getGmlFileStream(null);
-				
+		addressGmlInputStream=adZipFile.getGmlFileStream(null);
+		
 		if (addressGmlInputStream==null) {
 			return;
 		}
@@ -72,6 +72,16 @@ public class CatAtom2Osm {
 		adminUnitParser.launchParser();
 		AdminUnitList adminUnitList=adminUnitParser.getAdminUnits();
 		Log.info("Number of AdminUnits: "+adminUnitList.size());
+		
+		// Assign AdminUnit to Addresses
+		addressList.assignAdminUnits(adminUnitList);
+		
+		// Assign PostalCodes to Addresses
+		addressList.assignPostalCodes(postalCodeList);
+		
+		// Assign Streets to Addresses
+		addressList.assignStreets(streetList);
+		
 		
 		// Open Building ZIP File
 		CadastreZipFile buZipFile=new CadastreZipFile(mDir, "BU", mZipCode);

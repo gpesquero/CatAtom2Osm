@@ -69,6 +69,28 @@ public class AddressParser extends BaseGmlParser {
 	@Override
 	protected void onTag(String tagName, Attributes attributes) {
 		
+		if (tagName.equalsIgnoreCase("AD:component")) {
+			
+			String xlinkValue=attributes.getValue("xlink:href");
+			
+			if (xlinkValue.startsWith("#ES.SDGC.PD")) {
+				
+				mAddress.mPostalCodeId=xlinkValue.replaceAll("#", "");
+			}
+			else if (xlinkValue.startsWith("#ES.SDGC.TN")) {
+				
+				mAddress.mStreetId=xlinkValue.replaceAll("#", "");
+			}
+			else if (xlinkValue.startsWith("#ES.SDGC.AU")) {
+				
+				mAddress.mAdminUnitId=xlinkValue.replaceAll("#", "");
+			}
+			else {
+				
+				Log.warning("AddressParser.onTag() <"+tagName+
+						"> unknown xlinkValue <"+xlinkValue+">");
+			}
+		}
 	}
 	
 	@Override

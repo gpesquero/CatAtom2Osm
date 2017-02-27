@@ -66,7 +66,7 @@ public class PostalCodeParser extends BaseGmlParser {
 		
 		if (tagName.equalsIgnoreCase("AD:postCode")) {
 			
-			mPostalCode.mCode=data;
+			mPostalCode.mCode=data.trim();
 		}
 	}
 }
