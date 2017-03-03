@@ -2,6 +2,9 @@ package osm.catatom2osm;
 
 public class BuildingPart extends BaseElement {
 	
+	public int mNumFloorsAboveGround=-1;
+	public int mNumFloorsBelowGround=-1;
+	
 	protected BuildingPart(String id) {
 		super(id);
 	}
@@ -25,31 +28,32 @@ public class BuildingPart extends BaseElement {
 			return false;
 		}
 		
-		/*
-		if (!extractExteriorTextRings()) {
+		if (mExteriorRingsCount>1) {
+			
+			Log.warning("BuildingPart <"+getId()+
+					"> has more than 1 external ring!!");
 			
 			mIsOk=false;
 			return false;
 		}
 		
-		if (mExteriorRings.size()==0) {
+		if (mNumFloorsAboveGround<0) {
 			
-			// No exterior ring detected in the zone
-			
-			Log.warning("No exterior ring detected in the BuildingPart with id="+
-					getId());
+			Log.warning("BuildingPart <"+getId()+
+					"> mNumFloorsAboveGround<0!!");
 			
 			mIsOk=false;
 			return false;
 		}
-		else if ((mExteriorRings.size()>1) &&
-				 (mInteriorRings.size()>0)) {
-				
-			Log.warning("BuildingPart with id <"+getId()+"> has "+
-					mExteriorRings.size()+" exterior zones and "+
-					mInteriorRings.size()+" interior zones");
+		
+		if (mNumFloorsBelowGround<0) {
+			
+			Log.warning("BuildingPart <"+getId()+
+					"> mNumFloorsBelowGround<0!!");
+			
+			mIsOk=false;
+			return false;
 		}
-		*/
 		
 		mIsOk=true;
 		

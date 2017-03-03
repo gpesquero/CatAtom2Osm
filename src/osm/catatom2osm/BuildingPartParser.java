@@ -63,6 +63,30 @@ public class BuildingPartParser extends BaseGmlParser {
 	
 	@Override
 	protected void onData(String tagName, String data) {
+		
+		if (tagName.equalsIgnoreCase("bu-ext2d:numberOfFloorsAboveGround")) {
+			
+			try {
+				mBuildingPart.mNumFloorsAboveGround=Integer.parseInt(data.trim());
+			}
+			catch(NumberFormatException e) {
+				
+				Log.warning("BuildingPartParser.onData() mNumFloorsAboveGround parseInt() error!!");
+				
+				mBuildingPart.mNumFloorsAboveGround=-1;
+			}
+		}
+		else if (tagName.equalsIgnoreCase("bu-ext2d:numberOfFloorsBelowGround")) {
+			
+			try {
+				mBuildingPart.mNumFloorsBelowGround=Integer.parseInt(data.trim());
+			}
+			catch(NumberFormatException e) {
+				
+				Log.warning("BuildingPartParser.onData() mNumFloorsBelowGround parseInt() error!!");
+				
+				mBuildingPart.mNumFloorsBelowGround=-1;
+			}
+		}
 	}
-
 }

@@ -175,6 +175,15 @@ public class OsmFile {
 			OsmTags tags=new OsmTags();
 			tags.put("building:part", "yes");
 			
+			tags.put("building:levels",
+					String.format("%d", buildingPart.mNumFloorsAboveGround));
+			
+			if (buildingPart.mNumFloorsBelowGround>0) {
+				
+				tags.put("building:levels:underground",
+					String.format("%d", buildingPart.mNumFloorsBelowGround));
+			}
+			
 			addRings(tags, rings);
 		}
 	}
