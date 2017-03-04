@@ -147,6 +147,23 @@ public class CatAtom2Osm {
 		
 		Log.info("Number of BuildingParts: "+buildingPartList.size());
 		
+		// Open the Other Construction GML file
+		InputStream otherConstructionGmlInputStream=buZipFile.getGmlFileStream(
+			"otherconstruction");
+		
+		if (otherConstructionGmlInputStream==null) {
+			return;
+		}
+		
+		// Pool parsing
+		
+		PoolParser poolParser=new PoolParser(otherConstructionGmlInputStream);
+		poolParser.launchParser();
+		
+		PoolList poolList=poolParser.getPools();
+		
+		Log.info("Number of Pools: "+poolList.size());
+		
 		CadastreZipFile cpZipFile=new CadastreZipFile(mDir, "CP", mZipCode);
 		
 		if (!cpZipFile.isOk()) {
@@ -192,6 +209,7 @@ public class CatAtom2Osm {
 		fullOsmFile.addAddresses(addressList);
 		fullOsmFile.addBuildings(buildingList);
 		fullOsmFile.addBuildingParts(buildingPartList);
+		fullOsmFile.addPools(poolList);
 		fullOsmFile.addZones(zoneList);
 		fullOsmFile.writeDataToFile();
 		fullOsmFile.close();
@@ -211,20 +229,25 @@ public class CatAtom2Osm {
 		buildingPartOsmFile.writeDataToFile();
 		buildingPartOsmFile.close();
 		
+		OsmFile poolOsmFile=new OsmFile(mDir, "pool.osm");
+		poolOsmFile.addPools(poolList);
+		poolOsmFile.writeDataToFile();
+		poolOsmFile.close();
+		
 		OsmFile zoneOsmFile=new OsmFile(mDir, "zones.osm");
 		zoneOsmFile.addZones(zoneList);
 		zoneOsmFile.writeDataToFile();
 		zoneOsmFile.close();
 		
-		OsmFile manzanasOsmFile=new OsmFile(mDir, "zones_blocks.osm");
-		manzanasOsmFile.addZones(blockList);
-		manzanasOsmFile.writeDataToFile();
-		manzanasOsmFile.close();
+		OsmFile blocksOsmFile=new OsmFile(mDir, "zones_blocks.osm");
+		blocksOsmFile.addZones(blockList);
+		blocksOsmFile.writeDataToFile();
+		blocksOsmFile.close();
 		
-		OsmFile poligonosOsmFile=new OsmFile(mDir, "zones_polygons.osm");
-		poligonosOsmFile.addZones(polygonList);
-		poligonosOsmFile.writeDataToFile();
-		poligonosOsmFile.close();
+		OsmFile polygonsOsmFile=new OsmFile(mDir, "zones_polygons.osm");
+		polygonsOsmFile.addZones(polygonList);
+		polygonsOsmFile.writeDataToFile();
+		polygonsOsmFile.close();
 		
 		
 		// Creation of the GeoJSON file to store the zones for the Task Manager
@@ -233,9 +256,9 @@ public class CatAtom2Osm {
 		geoJsonFile.writeZones(zoneList);
 		geoJsonFile.close();
 		
-		GeoJsonFile manzanasGeoJsonFile=new GeoJsonFile(mDir, "zones_blocks.geojson");
-		manzanasGeoJsonFile.writeZones(blockList);
-		manzanasGeoJsonFile.close();
+		GeoJsonFile blocksGeoJsonFile=new GeoJsonFile(mDir, "zones_blocks.geojson");
+		blocksGeoJsonFile.writeZones(blockList);
+		blocksGeoJsonFile.close();
 		
 		GeoJsonFile poliginosGeoJsonFile=new GeoJsonFile(mDir, "zones_polygons.geojson");
 		poliginosGeoJsonFile.writeZones(polygonList);
@@ -248,6 +271,7 @@ public class CatAtom2Osm {
 		Log.info("Number of AdminUnits: "+adminUnitList.size());
 		Log.info("Number of Buildings: "+buildingList.size());
 		Log.info("Number of BuildingParts: "+buildingPartList.size());
+		Log.info("Number of Pools: "+poolList.size());
 		Log.info("Number of Parcels: "+parcelList.size());
 		Log.info("Number of Zones: "+zoneList.size());
 		Log.info("Number of Zones (BLOCKS): "+blockList.size());

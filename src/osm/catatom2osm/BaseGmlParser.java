@@ -105,10 +105,11 @@ public abstract class BaseGmlParser extends DefaultHandler {
 			}
 		}
 		else if ((qName.equalsIgnoreCase("gml:Point")) ||
-				(qName.equalsIgnoreCase("gml:Surface"))) {
+				(qName.equalsIgnoreCase("gml:Surface")) ||
+				(qName.equalsIgnoreCase("gml:Polygon"))) {
 			
-			// We've detected a Point or Surface tag. We have to get the EPSG
-			// from the srsName attribute
+			// We've detected a Point, Surface or Polygon tag.
+			// We have to get the EPSG from the srsName attribute
 			
 			String value=attributes.getValue("srsName");
 			

@@ -188,6 +188,26 @@ public class OsmFile {
 		}
 	}
 	
+	void addPools(PoolList pools) {
+		
+		Iterator<Pool> poolIter=pools.iterator();
+		
+		while(poolIter.hasNext()) {
+			
+			Pool pool=poolIter.next();
+			
+			if (!pool.isOk())
+				continue;
+			
+			ArrayList<TextRing> rings=pool.getRings();
+			
+			OsmTags tags=new OsmTags();
+			tags.put("leisure", "swimming_pool");
+			
+			addRings(tags, rings);
+		}
+	}
+	
 	void addZones(ZoneList zones) {
 		
 		Iterator<Zone> zoneIter=zones.iterator();
