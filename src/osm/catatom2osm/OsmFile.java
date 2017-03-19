@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 
 public class OsmFile {
 	
@@ -46,34 +47,118 @@ public class OsmFile {
 		Log.info("Creating output file <"+outFile.getAbsolutePath()+">");
 	}
 	
+	OsmNode createNode(String lon, String lat) {
+		
+		// First, check if there's an existing node in the same place
+		
+		for(int i=0; i<mNodes.size(); i++) {
+			
+			OsmNode node=mNodes.get(i);
+			
+			if ((node.mLon.equals(lon)) &&
+				(node.mLat.equals(lat))) {
+				
+				return node;
+			}
+		}
+		
+		// No existing node detected in this place. Create a new one
+		
+		OsmNode newNode=new OsmNode(lon, lat);
+		
+		int id=-(mNodes.size()+1);
+		
+		newNode.setId(id);
+		
+		mNodes.add(newNode);
+		
+		return newNode;
+	}
+	
+	OsmWay createWay(OsmTags tags, TextRing ring) {
+		
+		if (tags==null) {
+			tags=new OsmTags();
+		}
+		
+		OsmWay newWay=new OsmWay(tags);
+		
+		Iterator<TextCoord> iter=ring.iterator();
+		
+		while(iter.hasNext()) {
+			
+			TextCoord coord=iter.next();
+			
+			OsmNode node=createNode(coord.mLon, coord.mLat);
+			
+			newWay.addNode(node);
+		}
+		
+		int id=-(mWays.size()+1);
+		
+		newWay.setId(id);
+		
+		mWays.add(newWay);
+		
+		return newWay;
+	}
+	
+	OsmRelation createRelation(OsmTags tags) {
+		
+		OsmRelation newRelation=new OsmRelation(tags);
+		
+		int id=-(mRelations.size()+1);
+		
+		newRelation.setId(id);
+		
+		mRelations.add(newRelation);
+		
+		return newRelation;
+	}
+	
 	void addAddresses(AddressList addresses) {
 		
-		Iterator<Address> iterator=addresses.iterator();
+		Log.info("addAddresses() starts...");
 		
-		while(iterator.hasNext()) {
+		//Iterator<Address> iterator=addresses.iterator();
+		
+		//while(iterator.hasNext()) {
+		
+		int size=addresses.size();
+		
+		for(int i=0; i<size; i++) {
 			
-			Address address=iterator.next();
+			//Address address=iterator.next();
+			Address address=addresses.get(i);
 			
 			if (!address.isOk())
 				continue;
 			
 			TextCoord pos=address.getPos();
 			
-			OsmNode newNode=new OsmNode(pos.mLon, pos.mLat);
+			//OsmNode newNode=new OsmNode(pos.mLon, pos.mLat);
+			OsmNode node=createNode(pos.mLon, pos.mLat);
 			
-			newNode.setTag("addr:housenumber", address.mDesignator);
+			node.setTag("addr:housenumber", address.mDesignator);
 			
 			if (address.mStreet!=null)
-				newNode.setTag("addr:street", address.mStreet);
+				node.setTag("addr:street", address.mStreet);
 			
 			if (address.mPostalCode!=null)
-				newNode.setTag("addr:postcode", address.mPostalCode);
+				node.setTag("addr:postcode", address.mPostalCode);
 			
 			if (address.mAdminUnit!=null)
-				newNode.setTag("addr:city", address.mAdminUnit);
+				node.setTag("addr:city", address.mAdminUnit);
 			
-			addNode(newNode);
+			//addNode(newNode);
+			
+			if (i%1000==0) {
+				
+				Log.info("addAddresses() progress="+String.format(Locale.US, "%d%%", i*100/size));
+			}
 		}
+		
+		Log.info("addAddresses() progress=100%");
 	}
 	
 	void addRings(OsmTags tags, ArrayList<TextRing> rings) {
@@ -89,7 +174,8 @@ public class OsmFile {
 			
 			tags.put("type", "multipolygon");
 			
-			OsmRelation relation=new OsmRelation(tags);
+			//OsmRelation relation=new OsmRelation(tags);
+			OsmRelation relation=createRelation(tags);
 			
 			Iterator<TextRing> ringIter=rings.iterator();
 			
@@ -120,32 +206,43 @@ public class OsmFile {
 				}
 				else {
 					
-					OsmWay way=new OsmWay(ring);
+					//OsmWay way=new OsmWay(ring);
+					OsmWay way=createWay(null, ring);
 					
 					relation.addWay(role, way);
 				}
 			}
 			
-			
-			addRelation(relation);
+			//addRelation(relation);
 		}
 		else {
 			
 			// The building has a single ring. Create a way
 			
+			/*
 			OsmWay way=new OsmWay(tags, rings.get(0));
 			
 			addWay(way);
+			*/
+			
+			createWay(tags, rings.get(0));
 		}
 	}
 	
 	void addBuildings(BuildingList buildings) {
 		
-		Iterator<Building> buildingIter=buildings.iterator();
+		Log.info("addBuildings() starts...");
 		
-		while(buildingIter.hasNext()) {
+		//Iterator<Building> buildingIter=buildings.iterator();
+		
+		//while(buildingIter.hasNext()) {
+		
+		int size=buildings.size();
+		
+		for(int i=0; i<size; i++) {
 			
-			Building building=buildingIter.next();
+			//Building building=buildingIter.next();
+			Building building=buildings.get(i);
 			
 			if (!building.isOk())
 				continue;
@@ -156,16 +253,30 @@ public class OsmFile {
 			tags.put("building", "yes");
 			
 			addRings(tags, rings);
+			
+			if (i%1000==0) {
+				
+				Log.info("addBuildings() progress="+String.format(Locale.US, "%d%%", i*100/size));
+			}
 		}
+		
+		Log.info("addBuildings() progress=100%");
 	}
 	
 	void addBuildingParts(BuildingPartList buildingParts) {
 		
-		Iterator<BuildingPart> buildingPartIter=buildingParts.iterator();
+		Log.info("addBuildingParts() starts...");
 		
-		while(buildingPartIter.hasNext()) {
+		//Iterator<BuildingPart> buildingPartIter=buildingParts.iterator();
+		
+		//while(buildingPartIter.hasNext()) {
+		
+		int size=buildingParts.size();
+		
+		for(int i=0; i<size; i++) {
 			
-			BuildingPart buildingPart=buildingPartIter.next();
+			//BuildingPart buildingPart=buildingPartIter.next();
+			BuildingPart buildingPart=buildingParts.get(i);
 			
 			if (!buildingPart.isOk())
 				continue;
@@ -185,16 +296,59 @@ public class OsmFile {
 			}
 			
 			addRings(tags, rings);
+			
+			if (i%1000==0) {
+				
+				Log.info("addBuildingParts() progress="+String.format(Locale.US, "%d%%", i*100/size));
+			}
 		}
+		
+		Log.info("addBuildingParts() progress=100%");
+	}
+	
+	void addParcels(ParcelList parcels) {
+		
+		Log.info("addParcels() starts...");
+		
+		int size=parcels.size();
+		
+		for(int i=0; i<size; i++) {
+			
+			Parcel parcel=parcels.get(i);
+			
+			if (!parcel.isOk())
+				continue;
+			
+			ArrayList<TextRing> rings=parcel.getRings();
+			
+			OsmTags tags=new OsmTags();
+			tags.put("area", "parcel");
+			
+			addRings(tags, rings);
+			
+			if (i%1000==0) {
+				
+				Log.info("addParcels() progress="+String.format(Locale.US, "%d%%", i*100/size));
+			}
+		}
+		
+		Log.info("addParcels() progress=100%");
 	}
 	
 	void addPools(PoolList pools) {
 		
-		Iterator<Pool> poolIter=pools.iterator();
+		Log.info("addPools() starts...");
 		
-		while(poolIter.hasNext()) {
+		//Iterator<Pool> poolIter=pools.iterator();
+		
+		//while(poolIter.hasNext()) {
+		
+		int size=pools.size();
+		
+		for(int i=0; i<size; i++) {
 			
-			Pool pool=poolIter.next();
+			//Pool pool=poolIter.next();
+			Pool pool=pools.get(i);
 			
 			if (!pool.isOk())
 				continue;
@@ -205,16 +359,30 @@ public class OsmFile {
 			tags.put("leisure", "swimming_pool");
 			
 			addRings(tags, rings);
+			
+			if (i%1000==0) {
+				
+				Log.info("addPools() progress="+String.format(Locale.US, "%d%%", i*100/size));
+			}
 		}
+		
+		Log.info("addPools() progress=100%");
 	}
 	
 	void addZones(ZoneList zones) {
 		
-		Iterator<Zone> zoneIter=zones.iterator();
+		Log.info("addZones() starts...");
 		
-		while(zoneIter.hasNext()) {
-			
-			Zone zone=zoneIter.next();
+		//Iterator<Zone> zoneIter=zones.iterator();
+		
+		//while(zoneIter.hasNext()) {
+		
+		int size=zones.size();
+		
+		for(int i=0; i<size; i++)  {
+		
+			//Zone zone=zoneIter.next();
+			Zone zone=zones.get(i);
 			
 			if (!zone.isOk())
 				continue;
@@ -222,12 +390,21 @@ public class OsmFile {
 			ArrayList<TextRing> rings=zone.getRings();
 			
 			OsmTags tags=new OsmTags();
-			tags.put("area", "yes");
+			tags.put("area", "zone");
 			
 			addRings(tags, rings);
+			
+			if (i%1000==0) {
+				
+				Log.info("addZones() progress="+
+						String.format(Locale.US, "%d%%", i*100/size));
+			}
 		}
+		
+		Log.info("addZones() progress=100%");
 	}
 	
+	/*
 	boolean addNode(OsmNode node) {
 		
 		int id=-(mNodes.size()+1);
@@ -260,6 +437,7 @@ public class OsmFile {
 		
 		return true;
 	}
+	*/
 	
 	/*
 	private boolean addMultipolygon(OsmTags tags,
@@ -312,7 +490,14 @@ public class OsmFile {
 		
 		// Make sure that all the relations, ways and nodes have an Id
 		// by adding all of them to the OsmFile
-		assignIds();
+		//assignIds();
+		
+		// Simplify geometries
+		simplifyGeometries();
+		
+		int numWrittenNodes=0;
+		int numWrittenWays=0;
+		int numWrittenRelations=0;
 		
 		Iterator<OsmNode> nodeIter=mNodes.iterator();
 		
@@ -320,10 +505,18 @@ public class OsmFile {
 			
 			OsmNode node=nodeIter.next();
 			
+			if (node==null) {
+				
+				// Erased node. Skip...
+				continue;
+			}
+			
 			if (!node.writeToFile(mOutputBuffer)) {
 				
 				break;
 			}
+			
+			numWrittenNodes++;
 		}
 		
 		Iterator<OsmWay> wayIter=mWays.iterator();
@@ -336,6 +529,8 @@ public class OsmFile {
 				
 				break;
 			}
+			
+			numWrittenWays++;
 		}
 		
 		Iterator<OsmRelation> relationIter=mRelations.iterator();
@@ -348,10 +543,12 @@ public class OsmFile {
 				
 				break;
 			}
+			
+			numWrittenRelations++;
 		}
 		
-		Log.info("Written to disk "+mNodes.size()+" nodes, "+mWays.size()+
-				" ways and "+mRelations.size()+" relations");
+		Log.info("Written to disk "+numWrittenNodes+" nodes, "+numWrittenWays+
+				" ways and "+numWrittenRelations+" relations");
 		
 		return true;
 	}
@@ -368,6 +565,7 @@ public class OsmFile {
 		}		
 	}
 	
+	/*
 	void assignIds() {
 		
 		// Check for unassigned ids in ways and nodes of the relations
@@ -431,5 +629,100 @@ public class OsmFile {
 				}
 			}
 		}
+	}
+	*/
+	
+	// Simplify geometries
+	void simplifyGeometries() {
+		
+		Log.info("simplifyGeometries() starting...");
+		
+		int numSimplifiedNodes=0;
+		
+		int size=mNodes.size();
+		
+		for(int i=0; i<size; i++)  {
+			
+			boolean keepProcessingNode=true;
+			
+			OsmNode node=mNodes.get(i);
+			
+			if (node==null) {
+				
+				// Invalid node. Skipping...
+				continue;
+			}
+			
+			Iterator<OsmRelation> relationIter=mRelations.iterator();
+			
+			while(relationIter.hasNext()) {
+				
+				OsmRelation relation=relationIter.next();
+				
+				if (relation.containsNodeWithId(node.mId)) {
+					
+					// This relation contains the node. Stop processing
+					keepProcessingNode=false;
+					break;
+				}
+			}
+			
+			if (!keepProcessingNode) {
+				continue;
+			}
+			
+			int numWaysContainingNode=0;
+			
+			double angle=-1.0;
+			
+			Iterator<OsmWay> wayIter=mWays.iterator();
+			
+			while(wayIter.hasNext()) {
+				
+				OsmWay way=wayIter.next();
+				
+				if (way.containsNodeWithId(node.mId)) {
+					
+					numWaysContainingNode++;
+					
+					angle=Math.toDegrees(way.simplifyNode(node.mId));
+					
+					if (angle<0.0) {
+						
+						// This node cannot be simplified. Skipping...
+						keepProcessingNode=false;
+						break;
+					}
+					
+					if (Math.abs(angle-180.0)>1.0) {
+						
+						// This node cannot be simplified. Skipping...
+						keepProcessingNode=false;
+						break;
+					}
+				}
+			}
+			
+			if ((numWaysContainingNode>0) && (keepProcessingNode)) {
+				
+				// Node can be simplified. Mark it!!
+				node.setTag("angle", String.format(Locale.US, "%.3f", angle));
+				
+				if (Math.abs(angle-180.0)<1.0) {
+					
+					node.setTag("highway", "service");
+					
+					numSimplifiedNodes++;
+				}
+			}
+			
+			if (i%5000==0) {
+				Log.info("simplifyGeometries() progress="+
+						String.format(Locale.US, "%d%%", i*100/size));
+			}
+		}
+		
+		Log.info("simplifyGeometries(): Simplified "+numSimplifiedNodes+
+				" node(s)");
 	}
 }

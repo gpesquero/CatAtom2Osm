@@ -210,10 +210,12 @@ public class CatAtom2Osm {
 		fullOsmFile.addBuildings(buildingList);
 		fullOsmFile.addBuildingParts(buildingPartList);
 		fullOsmFile.addPools(poolList);
+		fullOsmFile.addParcels(parcelList);
 		fullOsmFile.addZones(zoneList);
 		fullOsmFile.writeDataToFile();
 		fullOsmFile.close();
 		
+		/*
 		OsmFile addressOsmFile=new OsmFile(mDir, "address.osm");
 		addressOsmFile.addAddresses(addressList);
 		addressOsmFile.writeDataToFile();
@@ -233,6 +235,7 @@ public class CatAtom2Osm {
 		poolOsmFile.addPools(poolList);
 		poolOsmFile.writeDataToFile();
 		poolOsmFile.close();
+		*/
 		
 		OsmFile zoneOsmFile=new OsmFile(mDir, "zones.osm");
 		zoneOsmFile.addZones(zoneList);

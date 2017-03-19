@@ -6,8 +6,8 @@ import java.util.Locale;
 
 public class OsmNode extends OsmItem {
 	
-	private String mLon=null;
-	private String mLat=null;
+	public String mLon=null;
+	public String mLat=null;
 	
 	public OsmNode(String lon, String lat) {
 		

@@ -3,6 +3,7 @@ package osm.catatom2osm;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Locale;
 
 public class OsmRelation extends OsmItem {
@@ -126,5 +127,19 @@ public class OsmRelation extends OsmItem {
 		}
 		
 		return line;
+	}
+	
+	boolean containsNodeWithId(int nodeId) {
+		
+		Iterator<OsmNode> nodeIter=mNodes.iterator();
+		
+		while(nodeIter.hasNext()) {
+			
+			OsmNode node=nodeIter.next();
+			
+			if (node.mId==nodeId)
+				return true;
+		}
+		return false;
 	}
 }
