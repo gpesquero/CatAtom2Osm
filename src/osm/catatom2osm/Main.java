@@ -3,7 +3,7 @@ package osm.catatom2osm;
 public class Main {
 	
 	static public final String mAppName="CatAtom2Osm";
-	static public final String mVersion="2017-03-19";
+	static public final String mVersion="2017-03-27";
 	
 	static public EpsgTransformer mTransformer=null; 
 	

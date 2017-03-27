@@ -62,6 +62,40 @@ public class BuildingParser extends BaseGmlParser {
 	
 	@Override
 	protected void onData(String tagName, String data) {
+		
+		if (tagName.equalsIgnoreCase("bu-core2d:conditionofConstruction")) {
+			
+			if (data.equalsIgnoreCase("ruin") ||
+				data.equalsIgnoreCase("declined") ||
+				data.equalsIgnoreCase("functional")) {
+				
+				mBuilding.mCondition=data;
+			}
+			else {
+				
+				Log.warning("BuildingParser.onData() incorrect conditionofConstruction value: "+data);
+				
+				mBuilding.mCondition=null;
+			}
+		}
+		else if (tagName.equalsIgnoreCase("bu-ext2d:currentUse")) {
+			
+			if (data.equalsIgnoreCase("1_residential") ||
+				data.equalsIgnoreCase("2_agriculture") ||
+				data.equalsIgnoreCase("3_industrial") ||
+				data.equalsIgnoreCase("4_1_office") ||
+				data.equalsIgnoreCase("4_2_retail") ||
+				data.equalsIgnoreCase("4_3_publicServices")) {
+				
+				mBuilding.mUse=data;
+			}
+			else {
+				
+				Log.warning("BuildingParser.onData() incorrect currentUse value: "+data);
+				
+				mBuilding.mUse=null;
+			}
+		}
 	}
 	
 	boolean checkBuildingList() {

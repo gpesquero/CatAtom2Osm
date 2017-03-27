@@ -35,13 +35,13 @@ public class OsmFile {
 		
 		try {
 			
-			mOutputBuffer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-			mOutputBuffer.write("<osm version=\"0.6\" generator=\""+Main.mAppName+"\">\n");
+			mOutputBuffer.write("<?xml version='1.0' encoding='UTF-8'?>\n");
+			mOutputBuffer.write("<osm version='0.6' generator='"+Main.mAppName+"' upload='false'>\n");
 			
 		} catch (IOException e) {
 			
 			Log.error("Error in mOutputBuffer.writer(): "+e.getMessage());
-			return;				
+			return;
 		}
 		
 		Log.info("Creating output file <"+outFile.getAbsolutePath()+">");
@@ -250,7 +250,63 @@ public class OsmFile {
 			ArrayList<TextRing> rings=building.getRings();
 			
 			OsmTags tags=new OsmTags();
-			tags.put("building", "yes");
+			//tags.put("building", "yes");
+			
+			if (building.mUse==null) {
+				
+				building.mUse="yes";
+			}
+			else {
+				
+				if (building.mUse.equalsIgnoreCase("1_residential")) {
+					
+					building.mUse="residential";
+				}
+				else if (building.mUse.equalsIgnoreCase("2_agriculture")) {
+					
+					building.mUse="barn";
+				}
+				else if (building.mUse.equalsIgnoreCase("3_industrial")) {
+					
+					building.mUse="industrial";
+				}
+				else if (building.mUse.equalsIgnoreCase("4_1_office")) {
+					
+					building.mUse="office";
+				}
+				else if (building.mUse.equalsIgnoreCase("4_2_retail")) {
+					
+					building.mUse="retail";
+				}
+				else if (building.mUse.equalsIgnoreCase("4_3_publicServices")) {
+					
+					building.mUse="public";
+				}
+				else {
+					building.mUse="yes";
+				}
+			}
+			
+			if (building.mCondition==null) {
+				
+				building.mUse="functional";
+			}
+			
+			if (building.mCondition.equalsIgnoreCase("ruin")) {
+				
+				tags.put("building", "ruins");
+				tags.put("ruins:building", building.mUse);
+			}
+			else if (building.mCondition.equalsIgnoreCase("declined")) {
+				
+				tags.put("building", "ruins");
+				tags.put("abandoned:building", building.mUse);
+				
+			}
+			else {
+				
+				tags.put("building", building.mUse);
+			}
 			
 			addRings(tags, rings);
 			
@@ -710,7 +766,9 @@ public class OsmFile {
 				
 				if (Math.abs(angle-180.0)<1.0) {
 					
-					node.setTag("highway", "service");
+					//node.setTag("highway", "service");
+					node.setTag("note", "FIXME");
+					node.setTag("fixme", "Node shall be deleted");
 					
 					numSimplifiedNodes++;
 				}
